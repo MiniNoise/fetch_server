@@ -1,0 +1,23 @@
+{
+  "name": "fetch_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mintell/fetch_server.git"
+  },
+  "author": "Arnaud LEHERPEUR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mintell/fetch_server/issues"
+  },
+  "homepage": "https://github.com/mintell/fetch_server#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "twit": "^2.2.11"
+  }
+}
