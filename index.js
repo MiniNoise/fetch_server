@@ -1,12 +1,42 @@
-var express = require('express');
-var app = express();
-var port = process.env.port || 8080;
-var router = express.Router();
+const process = require('process');
+const express = require('express');
+const app = express();
+var params = [];
 
-router.get('/', function(req, res) {
-	res.json({message: 'Welcome to MiniFetch api '})
+switch (process.argv[2]) {
+	case "Twitter":
+		process.argv.forEach((val, index) => {
+			if (index > 2)
+				params[params.length] = val;
+		});
+		console.log(params);
+		break;
+
+	default:
+		console.log("Please follow the README.md for execute the script");
+		break;
+}
+
+app.get('/', (req, res) => {
+    return res.send('Hello world');
 });
 
-console.log('[Server minifetch]: Starting');
-app.listen(port);
-console.log('[Server minifetch]: Listen on port: ' + port + ' ✔️');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
+
+app.get('/store/:key', async (req, res) => {
+    const { key } = req.params;
+    const value = req.query;
+    await redisClient.setAsync(key, JSON.stringify(value));
+    return res.send('Success');
+});
+
+app.get('/:key', async (req, res) => {
+    const { key } = req.params;
+    const rawData = await redisClient.getAsync(key);
+    return res.json(JSON.parse(rawData));
+});
+
+//TODO ADD FORK
