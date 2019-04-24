@@ -12,7 +12,7 @@ function TwitterListen(MinitelId, target) {
 		json['author'] = '@' + tweet.user.name;
 		json['message'] = tweet.text;
 		redisClient.setAsync("twitter", JSON.stringify(json));	
-		console.log("push");
+		console.log("PUSH BY:" + MinitelId);
 	});
 }
 

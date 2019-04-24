@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node_modules/.bin/nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,12 @@
   "homepage": "https://github.com/mintell/fetch_server#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "mongoose": "^5.5.2",
+    "pg": "^7.10.0",
     "redis": "^2.8.0",
     "twit": "^2.2.11"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
   }
 }

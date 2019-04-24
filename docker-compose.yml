@@ -7,6 +7,8 @@ networks:
 volumes:
   redis-data:
     driver: local
+  mongo-data:
+    driver: local
 
 services:
   app:
@@ -15,8 +17,11 @@ services:
       - .:/app
     environment:
       - REDIS_URL=redis://cache
+      - DATABASE_URL=mongo://db/mininoise
+      - PORT=3000 
     depends_on:
       - redis
+      - mongo
     ports:
       - "3000:3000"
       - "9229:9299"
@@ -32,5 +37,15 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis-data:/var/lib/redis
+    networks:
+      - back
+
+  mongo:
+    image: mongo:latest
+    container_name: db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/var/lib/mongo
     networks:
       - back

@@ -9,6 +9,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY . .
 
-RUN npm install
+RUN npm install --no-optional
 
 CMD ./run.sh

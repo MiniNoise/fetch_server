@@ -1,4 +1,4 @@
 #!/bin/sh
 
 npm run build
-node .
+npm run start
