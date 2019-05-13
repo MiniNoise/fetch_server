@@ -1,21 +1,25 @@
 const {promisify} = require('util');
 var Twit = require('twit');
 var config = require('../Config/Twitter');
-var Twitter = new Twit(config);
+var TTwitter = new Twit(config);
 const redisClient = require('./redis-client');
 
-function TwitterListen(MinitelId, target) {
-	var stream_msg = Twitter.stream('statuses/filter', {track: target});
 
-	stream_msg.on('tweet', function(tweet) {
-		var json = {};
-		json['author'] = '@' + tweet.user.name;
-		json['message'] = tweet.text;
-		redisClient.setAsync("twitter", JSON.stringify(json));	
-		console.log("PUSH BY:" + MinitelId);
-	});
+class Twitter{
+	constructor(MinitelId, target) {
+		var newArr = target.trim().split(",");
+		this.stream_msg = TTwitter.stream('statuses/filter', {track: newArr});
+	}
+	run() {
+		console.log("Super");
+		this.stream_msg.on('tweet', function(tweet) {
+			var json = {};
+			json['author'] = '@' + tweet.user.name;
+			json['message'] = tweet.text;
+			redisClient.setAsync("twitter", JSON.stringify(json));	
+			console.log("PUSH BY:");
+		});
+	}
 }
 
-module.exports = {
-	ListenTwitter: promisify(TwitterListen)
-}
+module.exports = Twitter;

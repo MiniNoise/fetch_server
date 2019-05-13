@@ -11,6 +11,7 @@ const numCPUs = require('os').cpus().length;
 //MODEL
 const Minitel = require('./Config/model/Minitel.js')
 
+processList = [];
 
 mongoose.connect('mongodb://db/mininoise', { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,30 +19,16 @@ app.use(bodyParser.json());
 
 
 function CreateProcess(MinitelId, Type, params) {
-	// if (cluster.isMaster) {
-		// console.log(`Master ${process.pid} is running`);
-	
-		// // Fork workers.
-		// for (let i = 0; i < numCPUs; i++) {
-		// 	cluster.fork();
-		// }
-	
-		// cluster.on('exit', (worker, code, signal) => {
-		// 	console.log(`worker ${worker.process.pid} died`);
-		// });
-	// } else {
 		switch (Type) {
 			case "Twitter":
 			console.log(params);
-				Twitter.ListenTwitter(MinitelId, params);
+				processList.push(new Twitter(MinitelId, params).run());
 				break;
 				
 			default:
 			console.log("Please follow the README.md for execute the script");
 			break;
 		}
-		// console.log(`Worker ${process.pid} started`);
-	// }
 }
 
 app.get('/', (req, res) => {
