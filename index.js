@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 function CreateProcess(MinitelId, Type, params) {
 		switch (Type) {
 			case "Twitter":
-			console.log(params);
+				console.log(params);
 				processList.push(new Twitter(MinitelId, params).run());
 				break;
 				
@@ -55,28 +55,30 @@ app.get('/:key', async (req, res) => {
 
 app.post("/api/minitel/new", async (req, res) => {	
 	var minitel = new Minitel();
+	var newArr = req.body.params.trim().split(",");
 	minitel.name = req.body.id;
-	minitel.flux[0] = {"type": req.body.type, "params": req.body.params}
+	minitel.flux[0] = {"type": req.body.type, "params": newArr};
 
 	minitel.save(function(err) {
-		if (err)
-			console.log(err);
-		else
-			console.log({ message: 'Minitel created!' });
+		if (err) {
+			return res.json(err);
+		} else {
+			CreateProcess(req.body.id, req.body.type, newArr);
+			return res.json({ message: 'Minitel created!' });
+		}
 	});
-	CreateProcess(req.body.id, req.body.type, req.body.params);
-	return res.json("create");
 });
 
 app.post("/api/minitel/:id/new/flux", async (req, res) => {	
-	Minitel.update({ "_id": req.params.id },{ "$push": { "flux": {"type": req.body.type, "params": req.body.params } } }, function(err) {
-		if (err)
-			console.log(err);
-		else
-			console.log({ message: 'Add flux !' });
+	var newArr = req.body.params.trim().split(",");
+	Minitel.update({ "_id": req.params.id },{ "$push": { "flux": {"type": req.body.type, "params": newArr } } }, function(err) {
+		if (err) {
+			return res.json(err);
+		} else {
+			CreateProcess(req.params.id, req.body.type, newArr);
+			return res.json({ message: 'Add flux !' });
+		}
 	});
-	CreateProcess(req.params.id, req.body.type, req.body.params);
-	return res.json("create");
 });
 
 app.get("/api/minitel/info/:id", async (req, res) => {
@@ -98,5 +100,4 @@ app.get("/api/minitel/all_minitel", async (req, res) => {
 	});
 });
 
-//TODO ADD FORK
 //TODO: Feature database for minitell logged + auto reboot
