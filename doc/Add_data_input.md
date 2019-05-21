@@ -12,19 +12,18 @@ If you need a config element like token, follow the Config_file.md
 
 After this you need to add your creation to createProcess in index.js
 
-``` javacript
-    function CreateProcess(MinitelId, Type, params) {
-        switch (type) {
-            case "Twitter": <--Like that-->
-                console.log(params);
-                Twitter.ListenTwitter("Twitter", params);
-                break;
+``` javascript
+function CreateProcess(MinitelId, Type, params) {
+    switch (type) {
+        case "Twitter": <--Like that-->
+            processList.push(new Twitter(MinitelId, params).run());
+            break;
 
-            default:
-                console.log("Please follow the README.md for execute the script");
-                break;
-        }
+        default:
+            console.log("Please follow the README.md for execute the script");
+            break;
     }
+}
 ```
 
 Make unit tests and you can create a new pull request for share your creation !
@@ -34,40 +33,39 @@ Make unit tests and you can create a new pull request for share your creation !
 File: ./src/twitter.js
 
 ``` javascript
-    const {promisify} = require('util');
-    var Twit = require('twit');
-    var config = require('../Config/Twitter');
-    var Twitter = new Twit(config);
-    const redisClient = require('./redis-client');
+const {promisify} = require('util');
+var Twit = require('twit');
+var config = require('../Config/Twitter');
+var TTwitter = new Twit(config);
+const redisClient = require('./redis-client');
 
-    function TwitterListen(MinitelId, target) {
-        var stream_msg = Twitter.stream('statuses/filter', {track: target});
-
-        stream_msg.on('tweet', function(tweet) {
+class Twitter{
+    constructor(MinitelId, target) {
+        var newArr = target.trim().split(",");
+        this.stream_msg = TTwitter.stream('statuses/filter', {track: newArr});
+    }
+    run() {
+        this.stream_msg.on('tweet', function(tweet) {
             var json = {};
             json['author'] = '@' + tweet.user.name;
             json['message'] = tweet.text;
-            redisClient.setAsync("twitter", JSON.stringify(json));	
-            console.log("PUSH BY:" + MinitelId);
+            redisClient.setAsync("twitter", JSON.stringify(json));
+            console.log("New event on Twitter API");
         });
     }
+}
 
-    module.exports = {
-        ListenTwitter: promisify(TwitterListen)
-    }
+module.exports = Twitter;
 ```
 
-``` javacript
-    function CreateProcess(MinitelId, Type, params) {
-        switch (type) {
-            case "Twitter":
-                console.log(params);
-                Twitter.ListenTwitter("Twitter", params);
-                break;
+``` javascript
+switch (Type) {
+    case "Twitter":
+        processList.push(new Twitter(MinitelId, params).run());
+        break;
 
-            default:
-                console.log("Please follow the README.md for execute the script");
-                break;
-        }
+    default:
+    console.log("Please follow the README.md for execute the script");
+    break;
 }
 ```
