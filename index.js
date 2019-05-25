@@ -9,8 +9,8 @@ const http = require('http');
 const numCPUs = require('os').cpus().length;
 
 //MODEL
-const Minitel = require('./Config/model/Minitel.js')
-
+const Minitel = require('./Config/model/Minitel.js');
+const Flux = require('./Config/model/Flux.js');
 processList = [];
 
 mongoose.connect('mongodb://db/mininoise', { useNewUrlParser: true });
@@ -40,43 +40,33 @@ app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
 
-app.get('/store/:key', async (req, res) => {
-    const { key } = req.params;
-    const value = req.query;
-    await redisClient.setAsync(key, JSON.stringify(value));
-    return res.send('Success');
-});
-
-app.get('/:key', async (req, res) => {
-    const { key } = req.params;
-    const rawData = await redisClient.getAsync(key);
-    return res.json(JSON.parse(rawData));
-});
-
-app.post("/api/minitel/new", async (req, res) => {	
-	var minitel = new Minitel();
-	var newArr = req.body.params.trim().split(",");
+app.post("/api/minitel/new", async (req, res) => {
+	var minitel = new Minitel({
+		name: req.body.id
+	});
 	minitel.name = req.body.id;
-	minitel.flux[0] = {"type": req.body.type, "params": newArr};
-
 	minitel.save(function(err) {
 		if (err) {
 			return res.json(err);
 		} else {
-			CreateProcess(req.body.id, req.body.type, newArr);
-			return res.json({ message: 'Minitel created!' });
+			return res.json({ message: 'Minitel created!', minitel_id: minitel._id });
 		}
 	});
 });
 
 app.post("/api/minitel/:id/new/flux", async (req, res) => {	
 	var newArr = req.body.params.trim().split(",");
-	Minitel.update({ "_id": req.params.id },{ "$push": { "flux": {"type": req.body.type, "params": newArr } } }, function(err) {
+	var flux = new Flux({
+		type: req.body.type,
+		params: newArr,
+		minitel_id: req.params.id
+	})
+	flux.save(function(err) {
 		if (err) {
 			return res.json(err);
 		} else {
-			CreateProcess(req.params.id, req.body.type, newArr);
-			return res.json({ message: 'Add flux !' });
+			CreateProcess(req.body.id, req.body.type, newArr);
+			return res.json({ message: 'Minitel created!' });
 		}
 	});
 });
@@ -87,7 +77,7 @@ app.get("/api/minitel/info/:id", async (req, res) => {
 			res.send(err);
 			console.log("PAS GG");
 		}
-		console.log(minitel);
+		res.send(minitel);
 	});
 });
 
@@ -100,4 +90,12 @@ app.get("/api/minitel/all_minitel", async (req, res) => {
 	});
 });
 
+app.get("/api/minitel/all_flux", async (req, res) => {
+	Flux.find(function(err, flux) {
+		if (err)
+			res.send(err);
+
+		res.json(flux);
+	});
+});
 //TODO: Feature database for minitell logged + auto reboot
