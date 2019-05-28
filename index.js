@@ -18,6 +18,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
+async function initService() {
+	var All_minitel;
+	
+	await Minitel.find(function(err, minitel) {
+		if (err)
+			return (84);
+		else
+			All_minitel = minitel;
+	});
+	console.log(All_minitel);
+	for (var minitel_iterator in All_minitel) {
+		var fluxList;
+		await Flux.find({minitel_id:All_minitel[minitel_iterator]._id}, function(err, flux) {
+			if (err)
+				res.send(err);
+			else
+				fluxList = flux;
+		});
+		for (var flux_iterator in fluxList) {
+			CreateProcess(All_minitel[minitel_iterator].name, fluxList[flux_iterator].type, fluxList[flux_iterator].params);
+		}
+	}
+}
+
 function CreateProcess(MinitelId, Type, params) {
 		switch (Type) {
 			case "Twitter":
@@ -37,6 +61,7 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+	initService();
     console.log(`Server listening on port ${PORT}`);
 });
 
@@ -44,7 +69,6 @@ app.post("/api/minitel/new", async (req, res) => {
 	var minitel = new Minitel({
 		name: req.body.id
 	});
-	minitel.name = req.body.id;
 	minitel.save(function(err) {
 		if (err) {
 			return res.json(err);
@@ -66,7 +90,7 @@ app.post("/api/minitel/:id/new/flux", async (req, res) => {
 			return res.json(err);
 		} else {
 			CreateProcess(req.body.id, req.body.type, newArr);
-			return res.json({ message: 'Minitel created!' });
+			return res.json({ message: 'Flux created!' });
 		}
 	});
 });
@@ -75,9 +99,9 @@ app.get("/api/minitel/info/:id", async (req, res) => {
 	Minitel.findById(req.params.id, function(err, minitel) {
 		if (err) {
 			res.send(err);
-			console.log("PAS GG");
+		} else {
+			res.send(minitel);
 		}
-		res.send(minitel);
 	});
 });
 
@@ -85,8 +109,8 @@ app.get("/api/minitel/all_minitel", async (req, res) => {
 	Minitel.find(function(err, minitel) {
 		if (err)
 			res.send(err);
-
-		res.json(minitel);
+		else
+			res.json(minitel);
 	});
 });
 
@@ -94,8 +118,12 @@ app.get("/api/minitel/all_flux", async (req, res) => {
 	Flux.find(function(err, flux) {
 		if (err)
 			res.send(err);
-
-		res.json(flux);
+		else
+			res.json(flux);
 	});
 });
-//TODO: Feature database for minitell logged + auto reboot
+
+// curl -d "id:Minitel-1" -X POST http://localhost:3000/api/minitel/new
+// curl -d '{"id":"minitel-1"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/minitel/new
+// curl -H "Content-Type: application/json" -X GET http://localhost:3000/api/minitel/info/5ced7af44837ab0105e9dcd1
+// curl -d '{"type":"Twitter", "params":"#google, #fire, #lucifer"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/minitel/5ced7af44837ab0105e9dcd1/new/flux
