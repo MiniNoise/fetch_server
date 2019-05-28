@@ -123,7 +123,8 @@ app.get("/api/minitel/all_flux", async (req, res) => {
 	});
 });
 
-// curl -d "id:Minitel-1" -X POST http://localhost:3000/api/minitel/new
+//TODO: improve API REST design
+
 // curl -d '{"id":"minitel-1"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/minitel/new
 // curl -H "Content-Type: application/json" -X GET http://localhost:3000/api/minitel/info/5ced7af44837ab0105e9dcd1
 // curl -d '{"type":"Twitter", "params":"#google, #fire, #lucifer"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/minitel/5ced7af44837ab0105e9dcd1/new/flux

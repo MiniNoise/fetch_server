@@ -12,7 +12,6 @@ class Twitter{
 		this.stream_msg = TTwitter.stream('statuses/filter', {track: "#acte28"});
 	}
 	run() {
-		console.log("Run ? " + this.MinitelId)
 		this.stream_msg.on('tweet', function(tweet) {
 			var json = {};
 			json['author'] = '@' + tweet.user.name;
