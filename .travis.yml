@@ -1,6 +1,4 @@
 language: ruby
-rvm:
-  - 2.0.0
 env:
   global:
   - USER="arnaud LEHERPEUR (CI/CD)"
