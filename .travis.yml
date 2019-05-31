@@ -1,4 +1,4 @@
-language: ruby
+language: minimal
 env:
   global:
   - USER="arnaud LEHERPEUR (CI/CD)"
