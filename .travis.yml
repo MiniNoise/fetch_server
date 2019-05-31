@@ -1,7 +1,11 @@
 language: minimal
+
+notifications:
+  email: false
+
 env:
   global:
-  - USER="arnaud LEHERPEUR (CI/CD)"
+  - USER="arnaud LEHERPEUR"
   - EMAIL="arnaud.leherpeur@epitech.eu"
   - REPO="name of target repo"
   - FILES="README.md Config doc src .gitignore Dockerfile docker-compose.yml enabled_plugins index.js package-lock.json package.json rabbitmq.config run.sh"
