@@ -1,0 +1,26 @@
+language: ruby
+rvm:
+  - 2.0.0
+env:
+  global:
+  - USER="arnaud LEHERPEUR (CI/CD)"
+  - EMAIL="arnaud.leherpeur@epitech.eu"
+  - REPO="name of target repo"
+  - FILES="README.md Config doc src .gitignore Dockerfile docker-compose.yml enabled_plugins index.js package-lock.json package.json rabbitmq.config run.sh"
+  - GH_REPO="https://github.com/epitech-toulouse/ProjectHub-MinitelOrange.git"
+  - secure: "put travis gem output here => http://docs.travis-ci.com/user/encryption-keys/"
+after_success:
+  - MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - git clone git://${GH_REPO}
+  - git remote
+  - git config user.email ${EMAIL}
+  - git config user.name ${USER}
+  - git checkout fetchServer
+  - cd ..
+  - mv -f ${FILES} ${REPO}
+  - cd ${REPO}
+  - git add ${FILES}
+  - git commit -m ${MESSAGE}
+  - git push "https://${TRAVIS_SECURE_TOKEN_NAME}@${GH_REPO}" master > /dev/null 2>&1
+on:
+  branch: master
