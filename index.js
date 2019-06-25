@@ -28,7 +28,6 @@ async function initService() {
 		else
 			All_minitel = minitel;
 	});
-	console.log(All_minitel);
 	for (var minitel_iterator in All_minitel) {
 		var fluxList;
 		await Flux.find({minitel_id:All_minitel[minitel_iterator]._id}, function(err, flux) {
@@ -46,10 +45,8 @@ async function initService() {
 function CreateProcess(MinitelId, Type, params) {
 		switch (Type) {
 			case "Twitter":
-				console.log(params);
-				processList.push(new Twitter(MinitelId, params).run());
+				processList.push(new Twitter(MinitelId, params).run(MinitelId));
 				break;
-				
 			default:
 			console.log("Please follow the README.md for execute the script");
 			break;
@@ -91,6 +88,9 @@ app.get("/api/v1/:id", async (req, res) => {
 
 app.post("/api/v1/:id/flux", async (req, res) => {	
 	var newArr = req.body.params.trim().split(",");
+	for (let index = 0; index < newArr.length; index++) {
+		newArr[index] = newArr[index].trim();
+	}
 	var flux = new Flux({
 		type: req.body.type,
 		params: newArr,
@@ -100,8 +100,14 @@ app.post("/api/v1/:id/flux", async (req, res) => {
 		if (err) {
 			return res.json(500, err);
 		} else {
-			CreateProcess(req.body.id, req.body.type, newArr);
-			return res.json({ message: 'Flux created!' });
+			Minitel.findById(req.params.id, (err, minitel) => {
+				if (err) {
+					res.send(500, err);
+				} else {
+					CreateProcess(minitel.name, req.body.type, newArr);
+					return res.json({ message: 'Flux created!' });
+				}
+			});
 		}
 	});
 });
@@ -124,9 +130,3 @@ app.get("/api/v1/minitel/flux", async (req, res) => {
 			res.json(flux);
 	});
 });
-
-//TODO: improve API REST design
-
-// curl -d '{"id":"minitel-1"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/minitel/new
-// curl -H "Content-Type: application/json" -X GET http://localhost:3000/api/minitel/info/5ced7af44837ab0105e9dcd1
-// curl -d '{"type":"Twitter", "params":"#google, #fire, #lucifer"}' -H "Content-Type: application/json" -X POST http://localhost:3000/api/5d077b55026d0200424711f2/flux
