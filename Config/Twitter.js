@@ -1,6 +1,6 @@
 module.exports = {
-	consumer_key: '***REMOVED***',
-	consumer_secret: '***REMOVED***',
-	access_token: '***REMOVED***',
-	access_token_secret: '***REMOVED***'
+	consumer_key: '',
+	consumer_secret: '',
+	access_token: '',
+	access_token_secret: ''
 }
